@@ -1,62 +1,30 @@
-// import fs from 'fs'
-// import path from 'path'
-// import { pool } from '../helper/db.js'
-// // import jwt from 'jsonwebtoken'
-// // const { verify } = jwt
-
-// const __dirname = import.meta.dirname
-
-// const initializeTestDb = () => {
-//     const sql = fs.readFileSync(path.resolve(__dirname,"../todo.sql"), "utf8");
-//     pool.query(sql)
-// }
-
-// const insertTestUser = (email, password) => {
-//     hash(password,10,(error,hashedPassword) => {
-//         pool.query('insert into account (email,password) values ($1,$2)',
-//             [email,hashedPassword]
-//         )
-//     })
-// }
-
-// const getToken = (email) => {
-//     return sign ({user: email}, process.env.JWT_SECRET_KEY)
-
-// }
-
-// export { initializeTestDb, insertTestUser, getToken }
-
-
-
 import fs from 'fs';
 import path from 'path';
-import { pool } from '../helpers/db.js';
-import bcrypt from 'bcrypt'; 
-import jwt from 'jsonwebtoken'; 
-import { fileURLToPath } from 'url'; 
+import { pool } from './db.js';
+import { hash } from 'bcrypt';
+import pkg from 'jsonwebtoken';
+const { sign } = pkg;
+import dotenv from 'dotenv';
+dotenv.config();
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url)); // Define __dirname
+const  __dirname = import.meta.dirname;
 
-// Function to initialize test database with SQL file
-const initializeTestDb = () => {
-    const sql = fs.readFileSync(path.resolve(__dirname, '../todo.sql'), "utf8");
-    pool.query(sql);
-};
+const initializeTestDb = async() => {
+    const sql = fs.readFileSync(path.resolve(__dirname, "../todo.sql"), "utf-8");
+    pool.query(sql );
+}
 
-// Function to insert a test user with a hashed password
-const insertTestUser = (email, password) => {
-    bcrypt.hash(password, 10, (error, hashedPassword) => {
-        if (error) throw error;
-        pool.query(
-            'INSERT INTO account (email, password) VALUES ($1, $2)',
-            [email, hashedPassword]
-        );
-    });
-};
+const insertTestUser = (email,password) => {
+    hash(password,10, (error, hashedPassword) => {
+        pool.query('insert into account (email, password) values ($1, $2)',
+        [email, hashedPassword]
+        
+        )
+    }
+    )
+}
+const getToken =(email) => {
+    return sign({user: email}, process.env.JWT_SECRET_KEY)
+}
 
-// Function to generate a token for a given email
-const getToken = (email) => {
-    return jwt.sign({ user: email }, process.env.JWT_SECRET_KEY);
-};
-
-export { initializeTestDb, insertTestUser, getToken };
+export { initializeTestDb, insertTestUser, getToken};
